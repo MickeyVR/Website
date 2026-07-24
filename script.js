@@ -1,3 +1,57 @@
+/* ==========================================================================
+   PASSWORD GATE PROTECTION LOGIC
+   ========================================================================== */
+(function() {
+    const SITE_PASSWORD = "YourSecretPassword123"; // <-- Change this to your desired password
+    const AUTH_KEY = "website_authenticated_session";
+
+    // Check if already authenticated in this session
+    if (sessionStorage.getItem(AUTH_KEY) === "true") {
+        return; // Allow page to load normally
+    }
+
+    // Hide body content initially or build overlay immediately
+    document.addEventListener("DOMContentLoaded", () => {
+        const overlay = document.createElement('div');
+        overlay.id = 'password-gate-overlay';
+        overlay.innerHTML = `
+            <div class="password-box">
+                <h2>Protected Website</h2>
+                <p style="font-size: 13px; color: #666; margin-bottom: 10px;">Please enter the password to view this site.</p>
+                <input type="password" id="gate-password-input" placeholder="Enter password...">
+                <button id="gate-submit-btn">Unlock</button>
+                <div class="password-error" id="gate-error-msg">Incorrect password. Please try again.</div>
+            </div>
+        `;
+        document.body.appendChild(overlay);
+
+        const passwordInput = document.getElementById('gate-password-input');
+        const submitBtn = document.getElementById('gate-submit-btn');
+        const errorMsg = document.getElementById('gate-error-msg');
+
+        function handleUnlock() {
+            if (passwordInput.value === SITE_PASSWORD) {
+                sessionStorage.setItem(AUTH_KEY, "true");
+                overlay.remove();
+            } else {
+                errorMsg.style.display = 'block';
+                passwordInput.value = '';
+                passwordInput.focus();
+            }
+        }
+
+        submitBtn.addEventListener('click', handleUnlock);
+        passwordInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                handleUnlock();
+            }
+        });
+
+        // Focus input automatically
+        passwordInput.focus();
+    });
+})();
+
 const menuToggle = document.getElementById('menu-toggle');
 const sidebar = document.getElementById('sidebar');
 const closeBtn = document.getElementById('close-btn');
