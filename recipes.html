@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Personal Website - Recipes</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <button class="hamburger-btn" id="menu-toggle" aria-label="Toggle Navigation">
+        <span></span>
+        <span></span>
+        <span></span>
+    </button>
+    <nav class="sidebar" id="sidebar">
+        <button class="close-btn" id="close-btn" aria-label="Close Navigation">&times;</button>
+        <ul>
+            <li><a href="index.html">Home</a></li>
+            <li><a href="photos.html">Photos</a></li>
+            <li><a href="#games">Games</a></li>
+            <li><a href="notes.html">Notes</a></li>
+            <li><a href="recipes.html" class="active-link">Recipes</a></li>
+            <li><a href="#etc">Etc.</a></li>
+        </ul>
+        <div class="sidebar-footer">
+            <button class="refresh-btn" id="refresh-btn" title="Refresh Page">&#x21bb; Refresh Page</button>
+        </div>
+    </nav>
+    <div class="overlay" id="overlay"></div>
+    <main class="recipes-container">
+        <div class="category-scroll-wrapper" style="padding: 0 0 15px 0;">
+            <div class="category-scroll" id="recipe-category-filters"></div>
+        </div>
+        <div class="recipes-controls">
+            <input type="text" id="recipe-search" placeholder="Search recipes by title or ingredients..." aria-label="Search recipes">
+            <button id="add-recipe-btn" class="btn-primary">+ New Recipe</button>
+        </div>
+        <div class="recipes-grid" id="recipes-grid"></div>
+    </main>
+    <div class="doc-editor-overlay" id="recipe-modal">
+        <header class="doc-header">
+            <div class="doc-header-left">
+                <button class="doc-back-btn" id="recipe-modal-close-btn" title="Back to Recipes">&larr;</button>
+                <div class="doc-title-container">
+                    <input type="text" id="recipe-title-input" class="doc-title-input" placeholder="Untitled Recipe" required>
+                    <input type="text" id="recipe-category-input" class="doc-title-input" placeholder="Category (e.g. Dessert)" style="font-size: 14px; margin-top: 8px; border: 1px solid var(--border-color); border-radius: 4px; padding: 4px 8px;">
+                </div>
+            </div>
+            <div class="doc-header-right">
+                <span class="doc-status-badge" id="recipe-doc-status" style="margin-right: 15px;">&#10003; Saved to browser</span>
+                <button id="delete-recipe-btn" class="btn-danger" style="display: none;">Delete</button>
+                <button id="save-recipe-btn" class="btn-primary">Save & Close</button>
+            </div>
+        </header>
+        <div class="doc-toolbar">
+            <button class="toolbar-btn" data-command="bold" title="Bold (Ctrl+B)"><b>B</b></button>
+            <button class="toolbar-btn" data-command="italic" title="Italic (Ctrl+I)"><i>I</i></button>
+            <button class="toolbar-btn" data-command="underline" title="Underline (Ctrl+U)"><u>U</u></button>
+            <span class="toolbar-divider"></span>
+            <button class="toolbar-btn" data-command="justifyLeft" title="Align Left">&#8676;</button>
+            <button class="toolbar-btn" data-command="justifyCenter" title="Align Center">&#8596;</button>
+            <button class="toolbar-btn" data-command="justifyRight" title="Align Right">&#8677;</button>
+            <span class="toolbar-divider"></span>
+            <button class="toolbar-btn" data-command="insertUnorderedList" title="Bullet List">&#8226; List</button>
+            <button class="toolbar-btn" data-command="insertOrderedList" title="Numbered List">1. List</button>
+        </div>
+        <div class="doc-canvas-container">
+            <input type="hidden" id="recipe-id">
+            <div class="doc-paper" id="recipe-body-editor" contenteditable="true" placeholder="Start typing your recipe here... (e.g., Ingredients, Instructions)"></div>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>

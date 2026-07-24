@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Personal Website - Home</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <button class="hamburger-btn" id="menu-toggle" aria-label="Toggle Navigation">
+        <span></span>
+        <span></span>
+        <span></span>
+    </button>
+    <nav class="sidebar" id="sidebar">
+        <button class="close-btn" id="close-btn" aria-label="Close Navigation">&times;</button>
+        <ul>
+            <li><a href="index.html" class="active-link">Home</a></li>
+            <li><a href="photos.html">Photos</a></li>
+            <li><a href="#games">Games</a></li>
+            <li><a href="notes.html">Notes</a></li>
+            <li><a href="recipes.html">Recipes</a></li>
+            <li><a href="#etc">Etc.</a></li>
+        </ul>
+        <div class="sidebar-footer">
+            <button class="refresh-btn" id="refresh-btn" title="Refresh Page">&#x21bb; Refresh Page</button>
+        </div>
+    </nav>
+    <div class="overlay" id="overlay"></div>
+    <main></main>
+    <script src="script.js"></script>
+</body>
+</html>

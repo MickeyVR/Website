@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Personal Website - Notes</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <button class="hamburger-btn" id="menu-toggle" aria-label="Toggle Navigation">
+        <span></span>
+        <span></span>
+        <span></span>
+    </button>
+    <nav class="sidebar" id="sidebar">
+        <button class="close-btn" id="close-btn" aria-label="Close Navigation">&times;</button>
+        <ul>
+            <li><a href="index.html">Home</a></li>
+            <li><a href="photos.html">Photos</a></li>
+            <li><a href="#games">Games</a></li>
+            <li><a href="notes.html" class="active-link">Notes</a></li>
+            <li><a href="recipes.html">Recipes</a></li>
+            <li><a href="#etc">Etc.</a></li>
+        </ul>
+        <div class="sidebar-footer">
+            <button class="refresh-btn" id="refresh-btn" title="Refresh Page">&#x21bb; Refresh Page</button>
+        </div>
+    </nav>
+    <div class="overlay" id="overlay"></div>
+    <main class="notes-container">
+        <div class="notes-controls">
+            <input type="text" id="note-search" placeholder="Search notes by title or content..." aria-label="Search notes">
+            <button id="add-note-btn" class="btn-primary">+ New Document</button>
+        </div>
+        <div class="notes-grid" id="notes-grid"></div>
+    </main>
+    <div class="doc-editor-overlay" id="note-modal">
+        <header class="doc-header">
+            <div class="doc-header-left">
+                <button class="doc-back-btn" id="modal-close-btn" title="Back to Notes">&larr;</button>
+                <div class="doc-title-container">
+                    <input type="text" id="note-title-input" class="doc-title-input" placeholder="Untitled document" required>
+                    <span class="doc-status-badge" id="doc-status">&#10003; Saved to browser</span>
+                </div>
+            </div>
+            <div class="doc-header-right">
+                <button id="delete-note-btn" class="btn-danger" style="display: none;">Delete</button>
+                <button id="save-note-btn" class="btn-primary">Save & Close</button>
+            </div>
+        </header>
+        <div class="doc-toolbar">
+            <button class="toolbar-btn" data-command="bold" title="Bold (Ctrl+B)"><b>B</b></button>
+            <button class="toolbar-btn" data-command="italic" title="Italic (Ctrl+I)"><i>I</i></button>
+            <button class="toolbar-btn" data-command="underline" title="Underline (Ctrl+U)"><u>U</u></button>
+            <span class="toolbar-divider"></span>
+            <button class="toolbar-btn" data-command="justifyLeft" title="Align Left">&#8676;</button>
+            <button class="toolbar-btn" data-command="justifyCenter" title="Align Center">&#8596;</button>
+            <button class="toolbar-btn" data-command="justifyRight" title="Align Right">&#8677;</button>
+            <span class="toolbar-divider"></span>
+            <button class="toolbar-btn" data-command="insertUnorderedList" title="Bullet List">&#8226; List</button>
+            <button class="toolbar-btn" data-command="insertOrderedList" title="Numbered List">1. List</button>
+        </div>
+        <div class="doc-canvas-container">
+            <input type="hidden" id="note-id">
+            <div class="doc-paper" id="note-body-editor" contenteditable="true" placeholder="Start typing your document here..."></div>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
