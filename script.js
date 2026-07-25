@@ -2,7 +2,7 @@
    PART 1: PASSWORD GATE PROTECTION
    ========================================================================== */
 (function() {
-    const SITE_PASSWORD = "YourSecretPassword123"; // Change your password here
+    const SITE_PASSWORD = "3208password"; // Change your password here
     const AUTH_KEY = "website_authenticated_session";
 
     if (sessionStorage.getItem(AUTH_KEY) === "true") return;
