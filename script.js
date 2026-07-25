@@ -42,9 +42,10 @@
 /* ==========================================================================
    PART 2: CLOUD SYNC CONFIGURATION
    ========================================================================== */
-// IMPORTANT: Replace these with your Supabase project keys
-const supabaseUrl = 'YOUR_SUPABASE_URL_HERE';
-const supabaseKey = 'YOUR_SUPABASE_ANON_KEY_HERE';
+
+// Replace these placeholders with the values from your Supabase API page:
+const supabaseUrl = https://wofstapemfzpbgphuiiz.supabase.co/rest/v1/';
+const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndvZnN0YXBlbWZ6cGJncGh1aWl6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQ5NDI5MjAsImV4cCI6MjEwMDUxODkyMH0.8YhV5z6A5Kf6R4wWXNkgF7wR3LAx_F6h9JDoRvqyYA0'; // Paste your long anon key here
 
 const cloud = window.supabase ? window.supabase.createClient(supabaseUrl, supabaseKey) : null;
 
