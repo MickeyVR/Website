@@ -2,7 +2,7 @@
    PASSWORD GATE PROTECTION LOGIC
    ========================================================================== */
 (function() {
-    const SITE_PASSWORD = "3208.password"; // <-- Change this to your desired password
+    const SITE_PASSWORD = "3208password"; // <-- Change this to your desired password
     const AUTH_KEY = "website_authenticated_session";
 
     // Check if already authenticated in this session
