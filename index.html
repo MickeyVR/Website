@@ -3,31 +3,27 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Personal Website - Home</title>
+    <title>Home - My Personal Website</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <button class="hamburger-btn" id="menu-toggle" aria-label="Toggle Navigation">
-        <span></span>
-        <span></span>
-        <span></span>
-    </button>
-    <nav class="sidebar" id="sidebar">
-        <button class="close-btn" id="close-btn" aria-label="Close Navigation">&times;</button>
-        <ul>
-            <li><a href="index.html" class="active-link">Home</a></li>
-            <li><a href="photos.html">Photos</a></li>
-            <li><a href="#games">Games</a></li>
-            <li><a href="notes.html">Notes</a></li>
-            <li><a href="recipes.html">Recipes</a></li>
-            <li><a href="#etc">Etc.</a></li>
-        </ul>
-        <div class="sidebar-footer">
-            <button class="refresh-btn" id="refresh-btn" title="Refresh Page">&#x21bb; Refresh Page</button>
-        </div>
-    </nav>
-    <div class="overlay" id="overlay"></div>
-    <main></main>
+    <header>
+        <nav>
+            <h1>My Website</h1>
+            <ul>
+                <li><a href="/" class="active">Home</a></li>
+                <li><a href="/photos">Photos</a></li>
+                <li><a href="/notes">Notes</a></li>
+                <li><a href="/recipes">Recipes</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main class="container">
+        <h2>Welcome to My Personal Site</h2>
+        <p>Use the navigation above to explore my photo gallery, personal notes, and recipes.</p>
+    </main>
+
     <script src="script.js"></script>
 </body>
 </html>

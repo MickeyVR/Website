@@ -1,0 +1,9 @@
+{
+  "version": 2,
+  "rewrites": [
+    { "source": "/", "destination": "/index.html" },
+    { "source": "/photos", "destination": "/photos.html" },
+    { "source": "/notes", "destination": "/notes.html" },
+    { "source": "/recipes", "destination": "/recipes.html" }
+  ]
+}
