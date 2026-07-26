@@ -34,8 +34,8 @@ if (refreshBtn) refreshBtn.addEventListener('click', refreshPage);
    2. CLOUDINARY DIRECT PHOTO UPLOAD LOGIC
    ========================================================================== */
 // YOUR CLOUDINARY CONFIGURATION (REPLACE WITH YOUR KEYS)
-const CLOUDINARY_CLOUD_NAME = 'testey';
-const CLOUDINARY_UPLOAD_PRESET = 'your_unsigned_preset_here';
+const CLOUDINARY_CLOUD_NAME = 'iwely9c9';
+const CLOUDINARY_UPLOAD_PRESET = 'ml_default';
 
 const photoGrid = document.getElementById('photo-grid');
 const photoInput = document.getElementById('photo-input');
