@@ -33,7 +33,7 @@ if (refreshBtn) refreshBtn.addEventListener('click', refreshPage);
 /* ==========================================================================
    2. CLOUDINARY DIRECT PHOTO UPLOAD & DYNAMIC FETCH LOGIC
    ========================================================================== */
-// REPLACE WITH YOUR CLOUDINARY ACCOUNT DETAILS:
+// YOUR ACTUAL CLOUDINARY CREDENTIALS:
 const CLOUDINARY_CLOUD_NAME = 'iwely9c9';
 const CLOUDINARY_UPLOAD_PRESET = 'ml_default';
 
@@ -45,12 +45,7 @@ const categoryPills = document.querySelectorAll('.category-pill');
 
 const PHOTO_STORAGE_KEY = 'my_website_photos';
 
-const defaultPhotos = [
-    { id: '1', src: 'https://images.unsplash.com/photo-1511632765486-a01980e01a18?auto=format&fit=crop&w=600&q=80', category: 'friends' },
-    { id: '2', src: 'https://images.unsplash.com/photo-1511895426328-dc8714191300?auto=format&fit=crop&w=600&q=80', category: 'family' }
-];
-
-let photos = JSON.parse(localStorage.getItem(PHOTO_STORAGE_KEY)) || defaultPhotos;
+let photos = JSON.parse(localStorage.getItem(PHOTO_STORAGE_KEY)) || [];
 
 function savePhotosToStorage() {
     localStorage.setItem(PHOTO_STORAGE_KEY, JSON.stringify(photos));
@@ -69,7 +64,7 @@ function renderPhotos(activeCategory = 'all') {
         card.setAttribute('data-category', p.category);
         card.innerHTML = `
             <img src="${p.src}" alt="${p.category} photo">
-            <button class="delete-photo-btn" title="Delete Photo">&times;</button>
+            <button class="delete-photo-btn" title="Hide Photo">&times;</button>
             <div class="photo-card-body">
                 <span class="photo-tag">${p.category}</span>
                 <button class="photo-link-btn">Copy Link</button>
@@ -90,6 +85,7 @@ function renderPhotos(activeCategory = 'all') {
             photos = photos.filter(item => item.id !== p.id);
             savePhotosToStorage();
             renderPhotos(getCurrentActiveCategory());
+            alert("Photo hidden from website. (Remember: To permanently delete, remove it from your Cloudinary Dashboard).");
         });
 
         photoGrid.appendChild(card);
@@ -109,7 +105,44 @@ categoryPills.forEach(pill => {
     });
 });
 
-// Upload file directly to Cloudinary with Website Tag
+// Fetch all tagged photos from Cloudinary on page load
+async function syncPhotosFromCloud() {
+    if (CLOUDINARY_CLOUD_NAME === 'your_cloud_name_here') return;
+
+    try {
+        const tag = 'my_website_photo';
+        // Cloudinary's special endpoint to get images by tag
+        const url = `https://res.cloudinary.com/${CLOUDINARY_CLOUD_NAME}/image/list/${tag}.json`;
+        
+        const response = await fetch(url);
+        if (!response.ok) {
+            console.log("Cloudinary resource list not found or not enabled in settings yet.");
+            return;
+        }
+
+        const data = await response.json();
+        
+        // Convert Cloudinary data into our photo object format
+        const cloudPhotos = data.resources.map(img => {
+            return {
+                id: img.public_id,
+                src: `https://res.cloudinary.com/${CLOUDINARY_CLOUD_NAME}/image/upload/v${img.version}/${img.public_id}.${img.format}`,
+                category: 'all' // Cloud sync defaults to 'all'
+            };
+        });
+
+        // Update our website's photo list if we found cloud photos
+        if (cloudPhotos.length > 0) {
+            photos = cloudPhotos;
+            savePhotosToStorage();
+            renderPhotos(getCurrentActiveCategory());
+        }
+
+    } catch (error) {
+        console.error("Error fetching from Cloudinary:", error);
+    }
+}
+
 if (uploadBtn && photoInput) {
     uploadBtn.addEventListener('click', async () => {
         const file = photoInput.files[0];
@@ -131,8 +164,7 @@ if (uploadBtn && photoInput) {
         const formData = new FormData();
         formData.append('file', file);
         formData.append('upload_preset', CLOUDINARY_UPLOAD_PRESET);
-        formData.append('tags', 'my_website_photo'); // Tagging for global fetch
-        formData.append('context', `category=${category}`); // Attaching category tag
+        formData.append('tags', 'my_website_photo'); // Required tag so we can fetch it later!
 
         try {
             const response = await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`, {
@@ -167,7 +199,9 @@ if (uploadBtn && photoInput) {
     });
 }
 
+// Initialize the page
 renderPhotos();
+syncPhotosFromCloud(); // Trigger the cloud fetch immediately!
 
 /* ==========================================================================
    3. SHARED GOOGLE DOCS EDITOR (NOTES & RECIPES)
@@ -313,7 +347,7 @@ document.querySelectorAll('.toolbar-btn').forEach(button => {
 });
 
 if (addDocBtn) addDocBtn.addEventListener('click', openNewDoc);
-if (modalCloseBtn) modalCloseBtn.addEventListener('click', closeModal);
+if (modalCloseBtn) modalCloseBtn.addEventListener('click', closeDoc);
 if (saveDocBtn) saveDocBtn.addEventListener('click', handleSaveDoc);
 if (deleteDocBtn) deleteDocBtn.addEventListener('click', handleDeleteDoc);
 
