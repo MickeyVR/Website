@@ -31,9 +31,9 @@ if (overlay) overlay.addEventListener('click', closeSidebar);
 if (refreshBtn) refreshBtn.addEventListener('click', refreshPage);
 
 /* ==========================================================================
-   2. CLOUDINARY DIRECT PHOTO UPLOAD LOGIC
+   2. CLOUDINARY DIRECT PHOTO UPLOAD & DYNAMIC FETCH LOGIC
    ========================================================================== */
-// YOUR CLOUDINARY CONFIGURATION (REPLACE WITH YOUR KEYS)
+// REPLACE WITH YOUR CLOUDINARY ACCOUNT DETAILS:
 const CLOUDINARY_CLOUD_NAME = 'iwely9c9';
 const CLOUDINARY_UPLOAD_PRESET = 'ml_default';
 
@@ -69,9 +69,21 @@ function renderPhotos(activeCategory = 'all') {
         card.setAttribute('data-category', p.category);
         card.innerHTML = `
             <img src="${p.src}" alt="${p.category} photo">
-            <div class="photo-tag">${p.category}</div>
             <button class="delete-photo-btn" title="Delete Photo">&times;</button>
+            <div class="photo-card-body">
+                <span class="photo-tag">${p.category}</span>
+                <button class="photo-link-btn">Copy Link</button>
+            </div>
         `;
+
+        card.querySelector('.photo-link-btn').addEventListener('click', (e) => {
+            e.stopPropagation();
+            navigator.clipboard.writeText(p.src).then(() => {
+                alert('Image link copied to clipboard:\n' + p.src);
+            }).catch(() => {
+                prompt('Copy this image link:', p.src);
+            });
+        });
 
         card.querySelector('.delete-photo-btn').addEventListener('click', (e) => {
             e.stopPropagation();
@@ -97,7 +109,7 @@ categoryPills.forEach(pill => {
     });
 });
 
-// Cloudinary Direct HTTP API Upload Handler
+// Upload file directly to Cloudinary with Website Tag
 if (uploadBtn && photoInput) {
     uploadBtn.addEventListener('click', async () => {
         const file = photoInput.files[0];
@@ -108,21 +120,21 @@ if (uploadBtn && photoInput) {
             return;
         }
 
-        if (CLOUDINARY_CLOUD_NAME === 'your_cloud_name_here') {
-            alert('Please enter your Cloudinary Cloud Name inside script.js first!');
+        if (CLOUDINARY_CLOUD_NAME === 'your_cloud_name_here' || CLOUDINARY_UPLOAD_PRESET === 'your_unsigned_preset_here') {
+            alert('Error: Please enter your Cloudinary Cloud Name and Unsigned Preset inside script.js first!');
             return;
         }
 
         uploadBtn.textContent = 'Uploading to Cloud...';
         uploadBtn.disabled = true;
 
-        // Build FormData for Cloudinary API request
         const formData = new FormData();
         formData.append('file', file);
         formData.append('upload_preset', CLOUDINARY_UPLOAD_PRESET);
+        formData.append('tags', 'my_website_photo'); // Tagging for global fetch
+        formData.append('context', `category=${category}`); // Attaching category tag
 
         try {
-            // Send direct HTTP POST to Cloudinary API endpoint
             const response = await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`, {
                 method: 'POST',
                 body: formData
@@ -133,20 +145,21 @@ if (uploadBtn && photoInput) {
             if (data.secure_url) {
                 const newPhoto = {
                     id: Date.now().toString(),
-                    src: data.secure_url, // Web URL provided by Cloudinary
+                    src: data.secure_url,
                     category: category
                 };
                 photos.unshift(newPhoto);
                 savePhotosToStorage();
                 renderPhotos(getCurrentActiveCategory());
                 photoInput.value = '';
-                alert('Success! Image uploaded to cloud.');
+                alert('Success! Photo uploaded to cloud.');
             } else {
-                alert('Upload failed: Check your Cloud Name and Preset settings.');
+                const errorMsg = data.error ? data.error.message : 'Unknown Cloudinary error';
+                alert(`Upload Failed: ${errorMsg}\n\nPlease check that your Upload Preset is set to "Unsigned" in Cloudinary Settings.`);
             }
         } catch (error) {
             console.error(error);
-            alert('An error occurred during upload.');
+            alert('Network error occurred while uploading. Please check your internet connection.');
         } finally {
             uploadBtn.textContent = '+ Upload to Cloud';
             uploadBtn.disabled = false;
@@ -300,7 +313,7 @@ document.querySelectorAll('.toolbar-btn').forEach(button => {
 });
 
 if (addDocBtn) addDocBtn.addEventListener('click', openNewDoc);
-if (modalCloseBtn) modalCloseBtn.addEventListener('click', closeDoc);
+if (modalCloseBtn) modalCloseBtn.addEventListener('click', closeModal);
 if (saveDocBtn) saveDocBtn.addEventListener('click', handleSaveDoc);
 if (deleteDocBtn) deleteDocBtn.addEventListener('click', handleDeleteDoc);
 
