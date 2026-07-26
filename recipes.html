@@ -3,31 +3,79 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Recipes - My Secure Site</title>
+    <title>My Personal Website - Recipes</title>
     <link rel="stylesheet" href="style.css">
 </head>
-<body>
-    <header>
-        <nav>
-            <h1>My Website</h1>
-            <ul>
-                <li><a href="/">Home</a></li>
-                <li><a href="/photos">Photos</a></li>
-                <li><a href="/notes">Notes</a></li>
-                <li><a href="/recipes" class="active">Recipes</a></li>
-            </ul>
-        </nav>
-    </header>
-    <main class="container">
-        <h2>My Recipes</h2>
-        <p>Your favorite cooking guides, all in one place.</p>
-    </main>
-    <script src="script.js"></script>
-</body>
-</html>
+<body data-page="recipes">
 
-<!-- Add this right above your script.js link -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <button class="hamburger-btn" id="menu-toggle" aria-label="Toggle Navigation">
+        <span></span>
+        <span></span>
+        <span></span>
+    </button>
+
+    <nav class="sidebar" id="sidebar">
+        <button class="close-btn" id="close-btn" aria-label="Close Navigation">&times;</button>
+        <ul>
+            <li><a href="index.html">Home</a></li>
+            <li><a href="photos.html">Photos</a></li>
+            <li><a href="#games">Games</a></li>
+            <li><a href="notes.html">Notes</a></li>
+            <li><a href="recipes.html" class="active-link">Recipes</a></li>
+            <li><a href="#etc">Etc.</a></li>
+        </ul>
+        <div class="sidebar-footer">
+            <button class="refresh-btn" id="refresh-btn" title="Refresh Page">
+                &#x21bb; Refresh Page
+            </button>
+        </div>
+    </nav>
+
+    <div class="overlay" id="overlay"></div>
+
+    <main class="docs-container">
+        <div class="docs-controls">
+            <input type="text" id="doc-search" placeholder="Search recipes by name or ingredients..." aria-label="Search recipes">
+            <button id="add-doc-btn" class="btn-primary">+ New Recipe</button>
+        </div>
+
+        <div class="docs-grid" id="doc-grid"></div>
+    </main>
+
+    <div class="doc-editor-overlay" id="doc-modal">
+        <header class="doc-header">
+            <div class="doc-header-left">
+                <button class="doc-back-btn" id="modal-close-btn" title="Back to Recipes">&larr;</button>
+                <div class="doc-title-container">
+                    <input type="text" id="doc-title-input" class="doc-title-input" placeholder="Recipe Name" required>
+                    <span class="doc-status-badge" id="doc-status">&#10003; Saved to browser</span>
+                </div>
+            </div>
+            <div class="doc-header-right">
+                <button id="delete-doc-btn" class="btn-danger" style="display: none;">Delete</button>
+                <button id="save-doc-btn" class="btn-primary">Save & Close</button>
+            </div>
+        </header>
+
+        <div class="doc-toolbar">
+            <button class="toolbar-btn" data-command="bold" title="Bold"><b>B</b></button>
+            <button class="toolbar-btn" data-command="italic" title="Italic"><i>I</i></button>
+            <button class="toolbar-btn" data-command="underline" title="Underline"><u>U</u></button>
+            <span class="toolbar-divider"></span>
+            <button class="toolbar-btn" data-command="justifyLeft" title="Align Left">&#8676;</button>
+            <button class="toolbar-btn" data-command="justifyCenter" title="Align Center">&#8596;</button>
+            <button class="toolbar-btn" data-command="justifyRight" title="Align Right">&#8677;</button>
+            <span class="toolbar-divider"></span>
+            <button class="toolbar-btn" data-command="insertUnorderedList" title="Bullet List">&#8226; List</button>
+            <button class="toolbar-btn" data-command="insertOrderedList" title="Numbered List">1. List</button>
+        </div>
+
+        <div class="doc-canvas-container">
+            <input type="hidden" id="doc-id">
+            <div class="doc-paper" id="doc-body-editor" contenteditable="true" placeholder="Start typing your ingredients and instructions here..."></div>
+        </div>
+    </div>
+
     <script src="script.js"></script>
 </body>
 </html>

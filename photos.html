@@ -3,30 +3,72 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Photos - My Secure Site</title>
+    <title>My Personal Website - Photos</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <header>
-        <nav>
-            <h1>My Website</h1>
-            <ul>
-                <li><a href="/">Home</a></li>
-                <li><a href="/photos" class="active">Photos</a></li>
-                <li><a href="/notes">Notes</a></li>
-                <li><a href="/recipes">Recipes</a></li>
-            </ul>
-        </nav>
-    </header>
-    <main class="container">
-        <h2>Private Photo Gallery</h2>
-        <div class="upload-section">
-            <input type="file" id="photo-file-input" accept="image/*">
-            <input type="text" id="photo-category-input" placeholder="Category (e.g., Family, Cars)...">
-            <button id="save-photo-btn" class="btn-primary">Upload to PC Storage</button>
+
+    <button class="hamburger-btn" id="menu-toggle" aria-label="Toggle Navigation">
+        <span></span>
+        <span></span>
+        <span></span>
+    </button>
+
+    <nav class="sidebar" id="sidebar">
+        <button class="close-btn" id="close-btn" aria-label="Close Navigation">&times;</button>
+        <ul>
+            <li><a href="index.html">Home</a></li>
+            <li><a href="photos.html" class="active-link">Photos</a></li>
+            <li><a href="#games">Games</a></li>
+            <li><a href="notes.html">Notes</a></li>
+            <li><a href="recipes.html">Recipes</a></li>
+            <li><a href="#etc">Etc.</a></li>
+        </ul>
+        <div class="sidebar-footer">
+            <button class="refresh-btn" id="refresh-btn" title="Refresh Page">
+                &#x21bb; Refresh Page
+            </button>
         </div>
-        <div id="photo-grid" class="grid-container"></div>
+    </nav>
+
+    <div class="overlay" id="overlay"></div>
+
+    <main class="gallery-container">
+        
+        <!-- Cloud Photo Upload Control Bar -->
+        <div class="upload-controls">
+            <input type="file" id="photo-input" accept="image/*" aria-label="Choose photo">
+            <select id="photo-category-select" aria-label="Select photo category">
+                <option value="friends">Friends</option>
+                <option value="family">Family</option>
+                <option value="food">Food</option>
+                <option value="memorys">Memorys</option>
+                <option value="etc">Ect</option>
+                <option value="stuff">Stuff</option>
+            </select>
+            <button id="upload-btn" class="btn-primary">+ Upload to Cloud</button>
+        </div>
+
+        <!-- Horizontal Category Scroller -->
+        <div class="category-scroll-wrapper">
+            <div class="category-scroll">
+                <button class="category-pill active" data-category="all">All</button>
+                <button class="category-pill" data-category="friends">Friends</button>
+                <button class="category-pill" data-category="family">Family</button>
+                <button class="category-pill" data-category="food">Food</button>
+                <button class="category-pill" data-category="memorys">Memorys</button>
+                <button class="category-pill" data-category="etc">Ect</button>
+                <button class="category-pill" data-category="stuff">Stuff</button>
+            </div>
+        </div>
+
+        <!-- VSCO-Style Photo Grid -->
+        <div class="photo-grid" id="photo-grid">
+            <!-- Photos dynamically injected by script.js -->
+        </div>
+
     </main>
+
     <script src="script.js"></script>
 </body>
 </html>

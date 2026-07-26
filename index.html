@@ -3,25 +3,45 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Home - My Secure Site</title>
+    <title>My Personal Website - Home</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <header>
-        <nav>
-            <h1>My Website</h1>
-            <ul>
-                <li><a href="/" class="active">Home</a></li>
-                <li><a href="/photos">Photos</a></li>
-                <li><a href="/notes">Notes</a></li>
-                <li><a href="/recipes">Recipes</a></li>
-            </ul>
-        </nav>
-    </header>
-    <main class="container">
-        <h2>Welcome to My Personal Space</h2>
-        <p>Your secure area for photos, notes, and recipes. Use the navigation to explore.</p>
+
+    <!-- Top-Left Hamburger Menu Button -->
+    <button class="hamburger-btn" id="menu-toggle" aria-label="Toggle Navigation">
+        <span></span>
+        <span></span>
+        <span></span>
+    </button>
+
+    <!-- Left Slide-Out Sidebar Navigation -->
+    <nav class="sidebar" id="sidebar">
+        <button class="close-btn" id="close-btn" aria-label="Close Navigation">&times;</button>
+        <ul>
+            <li><a href="index.html" class="active-link">Home</a></li>
+            <li><a href="photos.html">Photos</a></li>
+            <li><a href="#games">Games</a></li>
+            <li><a href="notes.html">Notes</a></li>
+            <li><a href="recipes.html">Recipes</a></li>
+            <li><a href="#etc">Etc.</a></li>
+        </ul>
+        <div class="sidebar-footer">
+            <button class="refresh-btn" id="refresh-btn" title="Refresh Page">
+                &#x21bb; Refresh Page
+            </button>
+        </div>
+    </nav>
+
+    <div class="overlay" id="overlay"></div>
+
+    <main class="content" id="home">
+        <section class="about-card">
+            <h2>About Me</h2>
+            <p>Hello! This is my very first personal website built using HTML and CSS.</p>
+        </section>
     </main>
+
     <script src="script.js"></script>
 </body>
 </html>

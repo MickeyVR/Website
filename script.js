@@ -1,200 +1,313 @@
 /* ==========================================================================
-   PART 1: SITE ENTRY PASSWORD GATE
+   1. SIDEBAR & NAVIGATION TOGGLE LOGIC
    ========================================================================== */
-(function() {
-    const SITE_PASSWORD = "YourSecretPassword123"; // Password to enter the website
-    const AUTH_KEY = "website_authenticated_session";
+const menuToggle = document.getElementById('menu-toggle');
+const sidebar = document.getElementById('sidebar');
+const closeBtn = document.getElementById('close-btn');
+const overlay = document.getElementById('overlay');
+const refreshBtn = document.getElementById('refresh-btn');
 
-    if (sessionStorage.getItem(AUTH_KEY) === "true") return;
-
-    document.addEventListener("DOMContentLoaded", () => {
-        const overlay = document.createElement('div');
-        overlay.id = 'password-gate-overlay';
-        overlay.innerHTML = `
-            <div class="password-box">
-                <h2 style="margin-top:0;">Protected Access</h2>
-                <input type="password" id="gate-password-input" placeholder="Enter password...">
-                <button id="gate-submit-btn">Unlock</button>
-                <div class="password-error" id="gate-error-msg">Incorrect password.</div>
-            </div>
-        `;
-        document.body.appendChild(overlay);
-
-        const passwordInput = document.getElementById('gate-password-input');
-        
-        function handleUnlock() {
-            if (passwordInput.value === SITE_PASSWORD) {
-                sessionStorage.setItem(AUTH_KEY, "true");
-                overlay.remove();
-            } else {
-                document.getElementById('gate-error-msg').style.display = 'block';
-                passwordInput.value = '';
-                passwordInput.focus();
-            }
-        }
-
-        document.getElementById('gate-submit-btn').addEventListener('click', handleUnlock);
-        passwordInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') handleUnlock(); });
-        passwordInput.focus();
-    });
-})();
-
-/* ==========================================================================
-   PART 2: CLOUD SYNC CONFIGURATION
-   ========================================================================== */
-
-// Replace these placeholders with the values from your Supabase API page:
-const supabaseUrl = https://wofstapemfzpbgphuiiz.supabase.co/rest/v1/';
-const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndvZnN0YXBlbWZ6cGJncGh1aWl6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQ5NDI5MjAsImV4cCI6MjEwMDUxODkyMH0.8YhV5z6A5Kf6R4wWXNkgF7wR3LAx_F6h9JDoRvqyYA0'; // Paste your long anon key here
-
-const cloud = window.supabase ? window.supabase.createClient(supabaseUrl, supabaseKey) : null;
-
-// Secure Deletion Helper Function
-function requestDeletePermission() {
-    const enteredPassword = prompt("Please enter the deletion password to confirm:");
-    if (enteredPassword === "Delete3208") {
-        return true;
-    } else {
-        alert("Incorrect password. Deletion cancelled.");
-        return false;
+function openSidebar() {
+    if (sidebar && overlay) {
+        sidebar.classList.add('active');
+        overlay.classList.add('active');
     }
 }
 
-document.addEventListener("DOMContentLoaded", () => {
-    if (!cloud) return; 
-
-    /* ==========================================================================
-       PART 3: PHOTOS LOGIC
-       ========================================================================== */
-    const photoGrid = document.getElementById('photo-grid');
-    const savePhotoBtn = document.getElementById('save-photo-btn');
-    const photoFileInput = document.getElementById('photo-file-input');
-
-    async function loadCloudPhotos() {
-        if (!photoGrid) return;
-        
-        const { data, error } = await cloud.storage.from('photos').list();
-        if (error) return console.error("Error loading photos:", error);
-
-        photoGrid.innerHTML = '';
-        data.sort((a, b) => new Date(b.created_at) - new Date(a.created_at)).forEach(file => {
-            if (file.name === '.emptyFolderPlaceholder') return;
-
-            const { data: publicUrlData } = cloud.storage.from('photos').getPublicUrl(file.name);
-            
-            const card = document.createElement('div');
-            card.className = "text-card"; 
-            card.innerHTML = `
-                <img src="${publicUrlData.publicUrl}" alt="Cloud Photo" style="width: 100%; height: 160px; object-fit: cover; border-radius: 4px; margin-bottom: 10px;">
-                <button class="delete-btn" style="width: 100%; background: #ef4444; color: white; border: none; padding: 5px; border-radius: 4px; cursor: pointer;">Delete Photo</button>
-            `;
-
-            // Handle Deletion
-            card.querySelector('.delete-btn').addEventListener('click', async () => {
-                if (requestDeletePermission()) {
-                    await cloud.storage.from('photos').remove([file.name]);
-                    loadCloudPhotos(); // Reload gallery
-                }
-            });
-
-            photoGrid.appendChild(card);
-        });
+function closeSidebar() {
+    if (sidebar && overlay) {
+        sidebar.classList.remove('active');
+        overlay.classList.remove('active');
     }
+}
 
-    if (savePhotoBtn && photoFileInput) {
-        savePhotoBtn.addEventListener('click', async () => {
-            const file = photoFileInput.files[0];
-            if (!file) return alert('Please select an image file first.');
+function refreshPage() {
+    window.location.reload();
+}
 
-            const uniqueFileName = `${Date.now()}-${file.name}`;
-            savePhotoBtn.textContent = "Uploading..."; 
+if (menuToggle) menuToggle.addEventListener('click', openSidebar);
+if (closeBtn) closeBtn.addEventListener('click', closeSidebar);
+if (overlay) overlay.addEventListener('click', closeSidebar);
+if (refreshBtn) refreshBtn.addEventListener('click', refreshPage);
 
-            const { error } = await cloud.storage.from('photos').upload(uniqueFileName, file);
-            if (!error) {
-                photoFileInput.value = ''; 
-                loadCloudPhotos();
-            } else {
-                alert("Upload failed.");
-            }
-            savePhotoBtn.textContent = "Upload to Cloud";
-        });
-    }
+/* ==========================================================================
+   2. CLOUDINARY DIRECT PHOTO UPLOAD LOGIC
+   ========================================================================== */
+// YOUR CLOUDINARY CONFIGURATION (REPLACE WITH YOUR KEYS)
+const CLOUDINARY_CLOUD_NAME = 'testey';
+const CLOUDINARY_UPLOAD_PRESET = 'your_unsigned_preset_here';
 
-    if (photoGrid) loadCloudPhotos();
+const photoGrid = document.getElementById('photo-grid');
+const photoInput = document.getElementById('photo-input');
+const photoCategorySelect = document.getElementById('photo-category-select');
+const uploadBtn = document.getElementById('upload-btn');
+const categoryPills = document.querySelectorAll('.category-pill');
 
-    /* ==========================================================================
-       PART 4: NOTES & RECIPES LOGIC
-       ========================================================================== */
-    async function loadTextData(tableName, gridId, searchQuery = "") {
-        const grid = document.getElementById(gridId);
-        if (!grid) return;
+const PHOTO_STORAGE_KEY = 'my_website_photos';
 
-        // Fetch data from the cloud table
-        const { data, error } = await cloud.from(tableName).select('*').order('created_at', { ascending: false });
-        if (error) return console.error(`Error loading ${tableName}:`, error);
+const defaultPhotos = [
+    { id: '1', src: 'https://images.unsplash.com/photo-1511632765486-a01980e01a18?auto=format&fit=crop&w=600&q=80', category: 'friends' },
+    { id: '2', src: 'https://images.unsplash.com/photo-1511895426328-dc8714191300?auto=format&fit=crop&w=600&q=80', category: 'family' }
+];
 
-        grid.innerHTML = '';
-        
-        // Filter by search query if one exists
-        const filteredData = data.filter(item => {
-            const lowerTitle = item.title.toLowerCase();
-            const lowerContent = item.content.toLowerCase();
-            const lowerQuery = searchQuery.toLowerCase();
-            return lowerTitle.includes(lowerQuery) || lowerContent.includes(lowerQuery);
+let photos = JSON.parse(localStorage.getItem(PHOTO_STORAGE_KEY)) || defaultPhotos;
+
+function savePhotosToStorage() {
+    localStorage.setItem(PHOTO_STORAGE_KEY, JSON.stringify(photos));
+}
+
+function renderPhotos(activeCategory = 'all') {
+    if (!photoGrid) return;
+
+    photoGrid.innerHTML = '';
+
+    const filteredPhotos = photos.filter(p => activeCategory === 'all' || p.category === activeCategory);
+
+    filteredPhotos.forEach(p => {
+        const card = document.createElement('div');
+        card.classList.add('photo-card');
+        card.setAttribute('data-category', p.category);
+        card.innerHTML = `
+            <img src="${p.src}" alt="${p.category} photo">
+            <div class="photo-tag">${p.category}</div>
+            <button class="delete-photo-btn" title="Delete Photo">&times;</button>
+        `;
+
+        card.querySelector('.delete-photo-btn').addEventListener('click', (e) => {
+            e.stopPropagation();
+            photos = photos.filter(item => item.id !== p.id);
+            savePhotosToStorage();
+            renderPhotos(getCurrentActiveCategory());
         });
 
-        filteredData.forEach(item => {
-            const card = document.createElement('div');
-            card.className = "text-card";
-            card.innerHTML = `
-                <h3>${item.title}</h3>
-                <p style="margin-bottom: 15px;">${item.content}</p>
-                <button class="delete-btn" style="background: #ef4444; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; font-size: 12px;">Delete</button>
-            `;
+        photoGrid.appendChild(card);
+    });
+}
 
-            // Handle Deletion
-            card.querySelector('.delete-btn').addEventListener('click', async () => {
-                if (requestDeletePermission()) {
-                    await cloud.from(tableName).delete().eq('id', item.id);
-                    loadTextData(tableName, gridId, document.getElementById(`search-${tableName}`).value);
-                }
-            });
+function getCurrentActiveCategory() {
+    const activePill = document.querySelector('.category-pill.active');
+    return activePill ? activePill.getAttribute('data-category') : 'all';
+}
 
-            grid.appendChild(card);
-        });
-    }
-
-    async function handleTextUpload(tableName, titleId, contentId, gridId) {
-        const title = document.getElementById(titleId).value.trim();
-        const content = document.getElementById(contentId).value.trim();
-        
-        if (!title || !content) return alert("Please fill in both fields.");
-
-        // Insert new record into the cloud database
-        const { error } = await cloud.from(tableName).insert([{ title: title, content: content }]);
-        
-        if (!error) {
-            document.getElementById(titleId).value = '';
-            document.getElementById(contentId).value = '';
-            loadTextData(tableName, gridId);
-        } else {
-            alert("Failed to save to cloud.");
-        }
-    }
-
-    // Initialize Notes
-    const notesGrid = document.getElementById('notes-grid');
-    if (notesGrid) {
-        loadTextData('notes', 'notes-grid');
-        document.getElementById('save-note-btn').addEventListener('click', () => handleTextUpload('notes', 'note-title', 'note-content', 'notes-grid'));
-        document.getElementById('search-notes').addEventListener('input', (e) => loadTextData('notes', 'notes-grid', e.target.value));
-    }
-
-    // Initialize Recipes
-    const recipesGrid = document.getElementById('recipes-grid');
-    if (recipesGrid) {
-        loadTextData('recipes', 'recipes-grid');
-        document.getElementById('save-recipe-btn').addEventListener('click', () => handleTextUpload('recipes', 'recipe-title', 'recipe-content', 'recipes-grid'));
-        document.getElementById('search-recipes').addEventListener('input', (e) => loadTextData('recipes', 'recipes-grid', e.target.value));
-    }
+categoryPills.forEach(pill => {
+    pill.addEventListener('click', () => {
+        categoryPills.forEach(p => p.classList.remove('active'));
+        pill.classList.add('active');
+        renderPhotos(pill.getAttribute('data-category'));
+    });
 });
+
+// Cloudinary Direct HTTP API Upload Handler
+if (uploadBtn && photoInput) {
+    uploadBtn.addEventListener('click', async () => {
+        const file = photoInput.files[0];
+        const category = photoCategorySelect.value;
+
+        if (!file) {
+            alert('Please select an image file first.');
+            return;
+        }
+
+        if (CLOUDINARY_CLOUD_NAME === 'your_cloud_name_here') {
+            alert('Please enter your Cloudinary Cloud Name inside script.js first!');
+            return;
+        }
+
+        uploadBtn.textContent = 'Uploading to Cloud...';
+        uploadBtn.disabled = true;
+
+        // Build FormData for Cloudinary API request
+        const formData = new FormData();
+        formData.append('file', file);
+        formData.append('upload_preset', CLOUDINARY_UPLOAD_PRESET);
+
+        try {
+            // Send direct HTTP POST to Cloudinary API endpoint
+            const response = await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`, {
+                method: 'POST',
+                body: formData
+            });
+
+            const data = await response.json();
+
+            if (data.secure_url) {
+                const newPhoto = {
+                    id: Date.now().toString(),
+                    src: data.secure_url, // Web URL provided by Cloudinary
+                    category: category
+                };
+                photos.unshift(newPhoto);
+                savePhotosToStorage();
+                renderPhotos(getCurrentActiveCategory());
+                photoInput.value = '';
+                alert('Success! Image uploaded to cloud.');
+            } else {
+                alert('Upload failed: Check your Cloud Name and Preset settings.');
+            }
+        } catch (error) {
+            console.error(error);
+            alert('An error occurred during upload.');
+        } finally {
+            uploadBtn.textContent = '+ Upload to Cloud';
+            uploadBtn.disabled = false;
+        }
+    });
+}
+
+renderPhotos();
+
+/* ==========================================================================
+   3. SHARED GOOGLE DOCS EDITOR (NOTES & RECIPES)
+   ========================================================================== */
+const docGrid = document.getElementById('doc-grid');
+const docSearch = document.getElementById('doc-search');
+const addDocBtn = document.getElementById('add-doc-btn');
+
+const docModal = document.getElementById('doc-modal');
+const modalCloseBtn = document.getElementById('modal-close-btn');
+const saveDocBtn = document.getElementById('save-doc-btn');
+const deleteDocBtn = document.getElementById('delete-doc-btn');
+
+const docIdInput = document.getElementById('doc-id');
+const docTitleInput = document.getElementById('doc-title-input');
+const docBodyEditor = document.getElementById('doc-body-editor');
+const docStatus = document.getElementById('doc-status');
+
+const pageType = document.body.getAttribute('data-page') || 'notes';
+const STORAGE_KEY = pageType === 'recipes' ? 'my_website_recipes' : 'my_website_notes';
+
+let docs = [];
+try {
+    docs = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+    if (!Array.isArray(docs)) docs = [];
+} catch (error) {
+    docs = [];
+}
+
+function saveToStorage() {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(docs));
+}
+
+function stripTags(html) {
+    if (!html) return '';
+    const div = document.createElement('div');
+    div.innerHTML = html;
+    return div.textContent || div.innerText || '';
+}
+
+function escapeHtml(str) {
+    if (!str) return '';
+    return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+}
+
+function renderDocs(filterText = '') {
+    if (!docGrid) return;
+
+    docGrid.innerHTML = '';
+
+    const filteredDocs = docs.filter(d => {
+        const title = (d.title || '').toLowerCase();
+        const body = stripTags(d.body).toLowerCase();
+        const search = filterText.toLowerCase();
+        return title.includes(search) || body.includes(search);
+    });
+
+    if (filteredDocs.length === 0) {
+        docGrid.innerHTML = `<p style="grid-column: 1/-1; color: #777;">No documents found.</p>`;
+        return;
+    }
+
+    filteredDocs.forEach(d => {
+        const card = document.createElement('div');
+        card.classList.add('doc-card');
+        card.innerHTML = `
+            <h4 class="doc-card-title">${escapeHtml(d.title || 'Untitled')}</h4>
+            <p class="doc-card-body">${escapeHtml(stripTags(d.body))}</p>
+            <span class="doc-card-date">${d.date || ''}</span>
+        `;
+        card.addEventListener('click', () => openEditDoc(d));
+        docGrid.appendChild(card);
+    });
+}
+
+function openNewDoc() {
+    docIdInput.value = '';
+    docTitleInput.value = '';
+    docBodyEditor.innerHTML = '';
+    deleteDocBtn.style.display = 'none';
+    if (docStatus) docStatus.textContent = 'Unsaved document';
+    docModal.classList.add('active');
+}
+
+function openEditDoc(doc) {
+    docIdInput.value = doc.id;
+    docTitleInput.value = doc.title || '';
+    docBodyEditor.innerHTML = doc.body || '';
+    deleteDocBtn.style.display = 'inline-block';
+    if (docStatus) docStatus.textContent = '✓ Saved to browser';
+    docModal.classList.add('active');
+}
+
+function closeDoc() {
+    docModal.classList.remove('active');
+}
+
+function handleSaveDoc() {
+    const title = docTitleInput.value.trim();
+    const body = docBodyEditor.innerHTML.trim();
+    const id = docIdInput.value;
+
+    const currentDate = new Date().toLocaleDateString('en-US', {
+        month: 'short',
+        day: 'numeric',
+        year: 'numeric'
+    });
+
+    if (id) {
+        docs = docs.map(d => d.id === id ? { ...d, title, body, date: currentDate } : d);
+    } else {
+        const newDoc = {
+            id: Date.now().toString(),
+            title: title || 'Untitled',
+            body: body,
+            date: currentDate
+        };
+        docs.unshift(newDoc);
+    }
+
+    saveToStorage();
+    renderDocs(docSearch ? docSearch.value : '');
+    if (docStatus) docStatus.textContent = '✓ Saved to browser';
+    closeDoc();
+}
+
+function handleDeleteDoc() {
+    const id = docIdInput.value;
+    if (id && confirm('Are you sure you want to delete this document?')) {
+        docs = docs.filter(d => d.id !== id);
+        saveToStorage();
+        renderDocs(docSearch ? docSearch.value : '');
+        closeDoc();
+    }
+}
+
+document.querySelectorAll('.toolbar-btn').forEach(button => {
+    button.addEventListener('click', (e) => {
+        e.preventDefault();
+        const command = button.getAttribute('data-command');
+        document.execCommand(command, false, null);
+    });
+});
+
+if (addDocBtn) addDocBtn.addEventListener('click', openNewDoc);
+if (modalCloseBtn) modalCloseBtn.addEventListener('click', closeDoc);
+if (saveDocBtn) saveDocBtn.addEventListener('click', handleSaveDoc);
+if (deleteDocBtn) deleteDocBtn.addEventListener('click', handleDeleteDoc);
+
+if (docSearch) {
+    docSearch.addEventListener('input', (e) => {
+        renderDocs(e.target.value);
+    });
+}
+
+renderDocs();
